@@ -66,7 +66,6 @@ class _LoginSectionState extends State<LoginSection> {
                     ),
                   ),
                   child: TextFormField(
-                    obscureText: true,
                     decoration: InputDecoration(
                       labelText: "Email",
                       prefixIcon: Icon(Icons.email),

@@ -3,6 +3,8 @@ import 'package:intl/intl.dart';
 import 'dart:async'; // Import the timer package
 
 class FooterWidget extends StatefulWidget {
+  const FooterWidget({super.key});
+
   @override
   State<FooterWidget> createState() => _FooterWidgetState();
 }

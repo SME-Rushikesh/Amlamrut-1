@@ -6,17 +6,14 @@ class ProductSelection extends StatefulWidget {
 }
 
 class _ProductSelectionState extends State<ProductSelection> {
-  // Dummy product list with prices
   final List<Map<String, dynamic>> products = [
     {'name': 'Product A', 'price': 50.0},
     {'name': 'Product B', 'price': 100.0},
     {'name': 'Product C', 'price': 150.0},
   ];
 
-  // List to store selected products
   List<Map<String, dynamic>> selectedProducts = [];
 
-  // Function to add a new product section
   void addProductSection() {
     setState(() {
       selectedProducts.add({
@@ -29,14 +26,18 @@ class _ProductSelectionState extends State<ProductSelection> {
     });
   }
 
-  // Function to remove a product section
   void removeProductSection(int index) {
     setState(() {
       selectedProducts.removeAt(index);
     });
   }
 
-  // Function to update final price based on quantity and discount
+  void resetFields() {
+    setState(() {
+      selectedProducts.clear();
+    });
+  }
+
   void updateFinalPrice(int index) {
     setState(() {
       double price = selectedProducts[index]['price'];
@@ -60,6 +61,7 @@ class _ProductSelectionState extends State<ProductSelection> {
         padding: EdgeInsets.all(12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(15),
+          // border: Border.all(color: Colors.black),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -70,7 +72,7 @@ class _ProductSelectionState extends State<ProductSelection> {
           color: Colors.white,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Expanded(
               child: SingleChildScrollView(
@@ -84,19 +86,40 @@ class _ProductSelectionState extends State<ProductSelection> {
 
             SizedBox(height: 15),
 
-            // Add More Product Button
-            ElevatedButton.icon(
-              onPressed: addProductSection,
-              icon: Icon(Icons.add),
-              label: Text("Add Product"),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.green,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+            // Reset & Add Product Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                // Reset Button
+                ElevatedButton.icon(
+                  onPressed: resetFields,
+                  icon: Icon(Icons.refresh),
+                  label: Text("Reset"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
                 ),
-                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              ),
+
+                // Add Product Button
+                ElevatedButton.icon(
+                  onPressed: addProductSection,
+                  icon: Icon(Icons.add),
+                  label: Text("Add Product"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                    padding: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -104,24 +127,21 @@ class _ProductSelectionState extends State<ProductSelection> {
     );
   }
 
-  // Function to build each product section
   Widget buildProductSection(int index) {
     return Card(
-      elevation: 5,
-      margin: EdgeInsets.symmetric(vertical: 8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      elevation: 0,
+      color: Colors.white,
+      margin: EdgeInsets.symmetric(vertical: 2),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       child: Padding(
-        padding: const EdgeInsets.all(6),
+        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
         child: Row(
           children: [
             // Product Dropdown
             Expanded(
               flex: 2,
               child: DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: "Select Product",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: inputDecoration("Product"),
                 value: selectedProducts[index]['selectedProduct'],
                 onChanged: (newValue) {
                   setState(() {
@@ -129,94 +149,102 @@ class _ProductSelectionState extends State<ProductSelection> {
                     double newPrice = products
                         .firstWhere((p) => p['name'] == newValue)['price'];
                     selectedProducts[index]['price'] = newPrice;
-                    updateFinalPrice(index); // Update final price
+                    updateFinalPrice(index);
                   });
                 },
                 items: products.map((product) {
                   return DropdownMenuItem<String>(
                     value: product['name'],
-                    child: Text(product['name']),
+                    child:
+                        Text(product['name'], style: TextStyle(fontSize: 12)),
                   );
                 }).toList(),
               ),
             ),
-            SizedBox(width: 10),
+
+            SizedBox(width: 5),
 
             // Quantity Field
             Expanded(
               flex: 1,
               child: TextField(
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Qty",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: inputDecoration("Qty"),
                 onChanged: (value) {
                   selectedProducts[index]['quantity'] = value;
                   updateFinalPrice(index);
                 },
               ),
             ),
-            SizedBox(width: 10),
 
-            // Auto-filled Price
+            SizedBox(width: 5),
+
+            // Price Field (Read-Only)
             Expanded(
               flex: 1,
               child: TextField(
                 readOnly: true,
-                decoration: InputDecoration(
-                  labelText: "Price",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: inputDecoration("Price"),
                 controller: TextEditingController(
                   text: selectedProducts[index]['price'].toStringAsFixed(2),
                 ),
               ),
             ),
-            SizedBox(width: 10),
+
+            SizedBox(width: 5),
 
             // Discount Field
             Expanded(
               flex: 1,
               child: TextField(
                 keyboardType: TextInputType.number,
-                decoration: InputDecoration(
-                  labelText: "Discount (%)",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: inputDecoration("Discount"),
                 onChanged: (value) {
                   selectedProducts[index]['discount'] = value;
                   updateFinalPrice(index);
                 },
               ),
             ),
-            SizedBox(width: 10),
 
-            // Final Price after Discount
+            SizedBox(width: 5),
+
+            // Final Price Field (Read-Only)
             Expanded(
               flex: 1,
               child: TextField(
                 readOnly: true,
-                decoration: InputDecoration(
-                  labelText: "Final Price",
-                  border: OutlineInputBorder(),
-                ),
+                decoration: inputDecoration("Final"),
                 controller: TextEditingController(
                   text:
                       selectedProducts[index]['finalPrice'].toStringAsFixed(2),
                 ),
               ),
             ),
-            SizedBox(width: 10),
+
+            SizedBox(width: 5),
 
             // Remove Button
             IconButton(
-              icon: Icon(Icons.remove_circle, color: Colors.red),
+              icon: Icon(Icons.remove_circle, color: Colors.red, size: 20),
               onPressed: () => removeProductSection(index),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  InputDecoration inputDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(fontSize: 12),
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: Colors.grey.shade200),
+      ),
+      contentPadding: EdgeInsets.symmetric(horizontal: 6, vertical: 4),
     );
   }
 }

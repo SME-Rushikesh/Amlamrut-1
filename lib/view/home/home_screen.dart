@@ -19,7 +19,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFC8F5E6), // Light pastel green background
 
-      appBar: _buildCustomAppBar(),
+      appBar: _buildCustomAppBar(context),
 
       body: SafeArea(
         child: Padding(
@@ -33,18 +33,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'New Sales',
                     icon: Icons.shopping_bag_outlined,
                     page: NewSalesPage(),
-                    containerColor: Colors.amber[700]!, // Dark Yellow
+                    gradientColors: [
+                      Color(0xFFFFD439),
+                      Color(0xFFFF7A00)
+                    ], // Orange Gradient
                     iconBgColor: Colors.white,
-                    iconColor: Colors.green[800]!, // Deep Green
+                    iconColor: Colors.green[800]!,
                   ),
                   SizedBox(width: 15),
                   _buildCard(
                     title: 'Sales Records',
                     icon: Icons.receipt_long,
                     page: SalesRecord(),
-                    containerColor: Colors.green[700]!, // Deep Green
+                    gradientColors: [
+                      Color(0xFF61C695),
+                      Color(0xFF133114)
+                    ], // Green Gradient
                     iconBgColor: Colors.white,
-                    iconColor: Colors.amber[900]!, // Golden Yellow
+                    iconColor: Colors.amber[900]!,
                   ),
                 ],
               ),
@@ -55,19 +61,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     title: 'Returns',
                     icon: Icons.autorenew,
                     page: ReturnsPage(),
-                    containerColor: Colors.orange[600]!, // Warm Orange
+                    gradientColors: [
+                      Color(0xFF7CF7FF),
+                      Color(0xFF4B73FF)
+                    ], // Purple Gradient
                     iconBgColor: Colors.white,
-                    iconColor: Colors.green[800]!, // Dark Green
+                    iconColor: Colors.amber[700]!,
                   ),
                   SizedBox(width: 15),
                   _buildCard(
                     title: 'Customers',
                     icon: Icons.people_alt_outlined,
                     page: CustomerPage(),
-                    containerColor:
-                        Colors.brown[400]!, // Earthy Brown for contrast
+                    gradientColors: [
+                      Color(0xFFFFF500),
+                      Color(0xFFFFB800)
+                    ], // Yellow Gradient
                     iconBgColor: Colors.white,
-                    iconColor: Colors.amber[700]!, // Warm Yellow
+                    iconColor: Colors.green[800]!,
                   ),
                 ],
               ),
@@ -79,9 +90,10 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   /// Custom AppBar with a smooth gradient, logo, and logout button
-  PreferredSizeWidget _buildCustomAppBar() {
+  PreferredSizeWidget _buildCustomAppBar(BuildContext context) {
     return PreferredSize(
-      preferredSize: const Size.fromHeight(70),
+      preferredSize:
+          const Size.fromHeight(40), // Increased height for better UI
       child: AppBar(
         automaticallyImplyLeading: false,
         elevation: 0,
@@ -112,61 +124,63 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ],
               ),
-              child: Row(
+              child: Stack(
+                alignment: Alignment.center,
                 children: [
-                  // Logo (Leading)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        fit: BoxFit.contain,
-                        width: 70,
-                        height: 70,
-                      ),
+                  // Centered Title
+                  const Text(
+                    "Dashboard",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 25,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
 
-                  const SizedBox(width: 10), // Space between logo and text
-
-                  // Dashboard Title
-                  const Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
+                  // Row for Logo and Logout Button
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(
-                        "Dashboard",
-                        style: TextStyle(
-                          color: Colors.black,
-                          fontSize: 25,
-                          fontWeight: FontWeight.bold,
+                      // Logo (Left side)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: ClipOval(
+                          child: Image.asset(
+                            'assets/images/logo.png',
+                            fit: BoxFit.contain,
+                            width: 50,
+                            height: 50,
+                          ),
                         ),
                       ),
+
+                      const Spacer(), // Pushes Logout to the right
+
+                      // Welcome Text & Logout Icon
+                      Row(
+                        children: [
+                          const Text(
+                            "Welcome, User",
+                            style: TextStyle(
+                              color: Colors.black87,
+                              fontSize: 16,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          // Logout Icon
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Login2nd()),
+                              );
+                            },
+                            child: _buildIcon(Icons.exit_to_app),
+                          ),
+                        ],
+                      ),
                     ],
-                  ),
-
-                  // Spacer to push the icon to the right
-                  const Spacer(),
-                  // Welcome Text
-                  const Text(
-                    "Welcome, User",
-                    style: TextStyle(
-                      color: Colors.black87,
-                      fontSize: 18,
-                    ),
-                  ),
-
-                  const SizedBox(width: 15),
-
-                  // Logout Icon
-                  GestureDetector(
-                    onTap: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => Login2nd()),
-                      );
-                    },
-                    child: _buildIcon(Icons.exit_to_app),
                   ),
                 ],
               ),
@@ -177,21 +191,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  /// Custom rounded icon button
   Widget _buildIcon(IconData icon) {
     return Container(
-      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
         shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-          ),
-        ],
+        color: Colors.white.withOpacity(0.3),
       ),
-      child: Icon(icon, color: Colors.black),
+      padding: const EdgeInsets.all(8),
+      child: Icon(icon, color: Colors.black, size: 24),
     );
   }
 
@@ -199,7 +206,7 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required String title,
     required Widget page,
-    required Color containerColor, // Background color for the card
+    required List<Color> gradientColors, // Gradient colors for background
     required Color iconBgColor, // Background color for the icon
     required Color iconColor, // Icon color
   }) {
@@ -212,10 +219,14 @@ class _HomeScreenState extends State<HomeScreen> {
           );
         },
         child: Container(
-          height: 180,
+          height: 270,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: containerColor, // Dynamic card background color
+            gradient: LinearGradient(
+              colors: gradientColors,
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
             borderRadius: BorderRadius.circular(20), // Smooth rounded edges
             boxShadow: [
               BoxShadow(

@@ -1,5 +1,7 @@
-import 'package:amlamrut/view/customer/customer.dart';
 import 'package:flutter/material.dart';
+import 'package:animated_custom_dropdown/custom_dropdown.dart';
+import 'package:amlamrut/view/customer/add_customer.dart';
+import 'dart:developer';
 
 class CustomerSelection extends StatefulWidget {
   @override
@@ -7,7 +9,7 @@ class CustomerSelection extends StatefulWidget {
 }
 
 class _CustomerSelectionState extends State<CustomerSelection> {
-  // Dummy customer list with details
+  // Customer List
   final List<Map<String, String>> customers = [
     {
       'name': 'Amit Sharma',
@@ -43,15 +45,19 @@ class _CustomerSelectionState extends State<CustomerSelection> {
 
   // Selected customer
   Map<String, String>? selectedCustomer;
-  String searchQuery = '';
   bool showCustomerDetails = false;
 
-  // Dummy total price details
+  // Pricing Details
   double totalAmount = 500.0;
   double discount = 10.0;
   double finalPrice = 0.0;
 
-  // Calculate final price
+  @override
+  void initState() {
+    super.initState();
+    calculateFinalPrice();
+  }
+
   void calculateFinalPrice() {
     setState(() {
       double discountAmount = (totalAmount * discount) / 100;
@@ -60,18 +66,12 @@ class _CustomerSelectionState extends State<CustomerSelection> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    calculateFinalPrice();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Expanded(
       flex: 1,
       child: Column(
         children: [
-          // Top container with dropdown and customer details
+          // Customer Selection Container
           Container(
             margin: EdgeInsets.all(10),
             padding: EdgeInsets.all(15),
@@ -92,103 +92,85 @@ class _CustomerSelectionState extends State<CustomerSelection> {
               ],
             ),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Searchable Customer Dropdown
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    DropdownButtonFormField<String>(
-                      decoration: InputDecoration(
-                        labelText: "Select Customer",
-                        border: OutlineInputBorder(),
-                        filled: true,
-                        fillColor: Colors.white,
-                      ),
-                      value: selectedCustomer?['name'],
-                      onChanged: (newValue) {
-                        setState(() {
-                          selectedCustomer = customers.firstWhere(
-                              (customer) => customer['name'] == newValue);
-                          showCustomerDetails = true;
-                        });
-                      },
-                      items: customers
-                          .where((customer) => customer['name']!
-                              .toLowerCase()
-                              .contains(searchQuery))
-                          .map((customer) {
-                        return DropdownMenuItem<String>(
-                          value: customer['name'],
-                          child: Text(customer['name']!),
-                        );
-                      }).toList(),
-                    ),
-                  ],
+                // Animated Dropdown
+                CustomDropdown<String>.search(
+                  hintText: "Select Customer",
+                  items:
+                      customers.map((customer) => customer['name']!).toList(),
+                  excludeSelected: false,
+                  onChanged: (name) {
+                    log('Selected Customer: $name');
+                    setState(() {
+                      selectedCustomer = customers
+                          .firstWhere((customer) => customer['name'] == name);
+                      showCustomerDetails = true;
+                    });
+                  },
                 ),
                 SizedBox(height: 10),
-
-                // Expandable Customer Details with Animation
-                // Fix Overflow Issue
+                // Expandable Customer Details
                 AnimatedSize(
                   duration: Duration(milliseconds: 500),
                   curve: Curves.easeInOut,
-                  child: showCustomerDetails
+                  child: showCustomerDetails && selectedCustomer != null
                       ? Container(
                           padding: EdgeInsets.all(10),
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: SingleChildScrollView(
-                            child: Column(
-                              children: [
-                                buildDetailRow(
-                                    "Name", selectedCustomer!['name']!),
-                                buildDetailRow(
-                                    "Mobile No", selectedCustomer!['mobile']!),
-                                buildDetailRow(
-                                    "Email", selectedCustomer!['email']!),
-                                buildDetailRow(
-                                  "Address",
-                                  "${selectedCustomer!['address']}, ${selectedCustomer!['city']}, ${selectedCustomer!['pin']}, ${selectedCustomer!['state']}",
-                                ),
-                                buildDetailRow(
-                                    "GST", selectedCustomer!['gst']!),
-                              ],
-                            ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              buildDetailRow(
+                                  "Name", selectedCustomer!['name']!),
+                              buildDetailRow(
+                                  "Mobile", selectedCustomer!['mobile']!),
+                              buildDetailRow(
+                                  "Email", selectedCustomer!['email']!),
+                              buildDetailRow(
+                                "Address",
+                                "${selectedCustomer!['address']}, ${selectedCustomer!['city']}, ${selectedCustomer!['pin']}, ${selectedCustomer!['state']}",
+                              ),
+                              buildDetailRow("GST", selectedCustomer!['gst']!),
+                            ],
                           ),
                         )
                       : Container(),
                 ),
-
-                SizedBox(
-                  height: 10,
-                ),
+                SizedBox(height: 10),
+                // Add Customer Button
                 SizedBox(
                   width: double.infinity,
                   child: TextButton.icon(
                     onPressed: () {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => CustomerPage()));
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => AddCustomerPage(
+                            onCustomerAdded: (customer) {
+                              setState(() {
+                                customers.add(customer);
+                              });
+                            },
+                          ),
+                        ),
+                      );
                     },
-                    label: Text(
-                      "Add Customer",
-                      style: TextStyle(color: Colors.green),
-                    ),
+                    label: Text("Add Customer",
+                        style: TextStyle(color: Colors.green)),
                     icon: Icon(Icons.add),
                   ),
-                )
+                ),
               ],
             ),
           ),
           Spacer(),
-
-          // Bottom container for price details
+          // Pricing Details Container
           Container(
             margin: EdgeInsets.all(10),
-            padding: EdgeInsets.all(15),
             decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(15),
@@ -207,12 +189,19 @@ class _CustomerSelectionState extends State<CustomerSelection> {
             ),
             child: Column(
               children: [
-                buildPriceRow(
-                    "Total Amount", "₹${totalAmount.toStringAsFixed(2)}"),
-                buildPriceRow("Discount", "$discount%"),
-                buildPriceRow(
-                    "Final Price", "₹${finalPrice.toStringAsFixed(2)}",
-                    isBold: true),
+                Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Column(
+                    children: [
+                      buildPriceRow(
+                          "Total Amount", "₹${totalAmount.toStringAsFixed(2)}"),
+                      buildPriceRow("Discount", "$discount%"),
+                      buildPriceRow(
+                          "Final Price", "₹${finalPrice.toStringAsFixed(2)}",
+                          isBold: true),
+                    ],
+                  ),
+                ),
                 SizedBox(height: 10),
                 SizedBox(
                   width: double.infinity,
@@ -225,10 +214,12 @@ class _CustomerSelectionState extends State<CustomerSelection> {
                       backgroundColor: Colors.green,
                       foregroundColor: Colors.white,
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.only(
+                          bottomLeft: Radius.circular(15),
+                          bottomRight: Radius.circular(15),
+                        ),
                       ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      padding: EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
