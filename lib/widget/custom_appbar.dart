@@ -1,17 +1,20 @@
 import 'dart:ui';
-import 'package:amlamrut/view/customer/customer.dart';
-import 'package:amlamrut/view/home/home_screen.dart';
-import 'package:amlamrut/view/new_sales/new_sales_page.dart';
-import 'package:amlamrut/view/record_screen/sales_record.dart';
-import 'package:amlamrut/view/returns/returns.dart';
-import 'package:flutter/material.dart';
 import 'package:amlamrut/view/login/login_2nd.dart';
+import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
+  final String storeName;
+  final String storeId;
   final String username;
 
-  const CustomAppBar({super.key, required this.title, this.username = "User"});
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    required this.storeName,
+    required this.storeId,
+    this.username = "User",
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -45,28 +48,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Sidebar Menu Icon
-                IconButton(
-                  icon: const Icon(Icons.menu, color: Colors.black, size: 28),
-                  onPressed: () {
-                    Scaffold.of(context).openDrawer(); // Open Sidebar
-                  },
-                ),
-
-                const SizedBox(width: 10),
-
-                // Title
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(width: 10),
-
                 // Logo
                 ClipOval(
                   child: Image.asset(
@@ -76,6 +57,64 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                     height: 50,
                   ),
                 ),
+                SizedBox(
+                  width: 10,
+                ),
+
+                // Dashboard Title with Store Info
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      Text(
+                        "$storeName - $storeId",
+                        style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 10,
+                ),
+                // Welcome User Section
+                Row(
+                  children: [
+                    const Icon(Icons.person, color: Colors.black, size: 28),
+                    const SizedBox(width: 5),
+                    Text(
+                      "Welcome, $username",
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+
+                    // Logout Icon Button
+                    IconButton(
+                      icon:
+                          const Icon(Icons.logout, color: Colors.red, size: 28),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => Login2nd()));
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
@@ -84,109 +123,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  // Sidebar Drawer Widget
-  Widget buildSidebar(BuildContext context) {
-    return Drawer(
-      child: Column(
-        children: [
-          UserAccountsDrawerHeader(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Color(0xFF56AB2F), Color(0xFFA8E063)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-            accountName: Text(
-              username,
-              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            accountEmail: const Text("user@example.com"),
-            currentAccountPicture: const CircleAvatar(
-              radius: 35,
-              backgroundColor: Colors.transparent,
-              child: ClipOval(
-                child: Image(
-                  image: AssetImage('assets/images/logo.png'),
-                  width: 80,
-                  height: 80,
-                  fit: BoxFit.contain,
-                ),
-              ),
-            ),
-          ),
-          ListTile(
-            leading: const Icon(Icons.dashboard),
-            title: const Text("Dashboard"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => HomeScreen()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.shopping_bag_outlined),
-            title: const Text("New Sales"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => NewSalesPage()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.receipt_long),
-            title: const Text("Sales Record"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => SalesRecord()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.autorenew),
-            title: const Text("Returns"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => ReturnsPage()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.people_alt_outlined),
-            title: const Text("Customers"),
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => CustomerPage()));
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.logout, color: Colors.red),
-            title: const Text("Logout", style: TextStyle(color: Colors.red)),
-            onTap: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => Login2nd()),
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIcon(IconData icon) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.2),
-        shape: BoxShape.circle,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 6,
-          ),
-        ],
-      ),
-      child: Icon(icon, color: Colors.black),
-    );
-  }
-
   @override
-  Size get preferredSize => const Size.fromHeight(40);
+  Size get preferredSize => const Size.fromHeight(30);
 }

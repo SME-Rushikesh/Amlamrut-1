@@ -1,6 +1,7 @@
 // import 'package:amlamrut/view/login.dart';
 import 'package:amlamrut/view/home/home_screen.dart';
 import 'package:amlamrut/view/login/login_2nd.dart';
+import 'package:amlamrut/view/new_sales/new_sales_page.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
       ),
       // home: Login(),
       home: Login2nd(),
-      // home: HomeScreen(),
+      // home: NewSalesPage(),
     );
   }
 }

@@ -67,8 +67,8 @@ class _CustomerSelectionState extends State<CustomerSelection> {
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      flex: 1,
+    return Container(
+      height: 450,
       child: Column(
         children: [
           // Customer Selection Container

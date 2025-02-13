@@ -83,9 +83,9 @@ class _CustomerPageState extends State<CustomerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: CustomAppBar(title: "Customers", username: "User")
-          .buildSidebar(context),
-      appBar: CustomAppBar(title: "Customers", username: "User"),
+      // drawer: CustomAppBar(title: "Customers", username: "User")
+      //     .buildSidebar(context),
+      // appBar: CustomAppBar(title: "Customers", username: "User"),
       body: _buildCustomerList(),
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToAddCustomer,
